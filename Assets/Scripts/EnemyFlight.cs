@@ -9,21 +9,38 @@ public class EnemyFlight : MonoBehaviour
     public FollowingTarget followingTarget;
     public GameObject flightPoint;
     public bool canMove = true;
-    public Transform[] moveSpots;
-    private int i = 0;
     public float speed = 1.2f;
-    
+    private Vector2[] middlePoints;
+    private bool didMiddlePointEstablished = false;
+    private int i = 0;
 
-    void Update()
+    private void Awake()
+    {
+        middlePoints = new Vector2[3];
+    }
+
+    private void SetMiddlePoints()
+    {
+        if (!didMiddlePointEstablished)
+        {
+            middlePoints[0] = new Vector2((flightPoint.transform.position.x - transform.position.x) / 3 + transform.position.x, (flightPoint.transform.position.y - transform.position.y) / 5 + transform.position.y);
+            middlePoints[1] = new Vector2(4 * (flightPoint.transform.position.x - transform.position.x) / 5 + transform.position.x, 2 * (flightPoint.transform.position.y - transform.position.y) / 3 + transform.position.y);
+            middlePoints[2] = flightPoint.transform.position;
+            didMiddlePointEstablished = true;
+        }
+    }
+
+
+    private void Update()
     {
         if (!followingTarget.canFollow && canMove)
         {
-            //StartCoroutine(CheckMoving());
-            transform.position = Vector2.MoveTowards(transform.position, moveSpots[i].transform.position, speed * Time.deltaTime);
+            SetMiddlePoints();
+            transform.position = Vector2.MoveTowards(transform.position, middlePoints[i], speed * Time.deltaTime);
 
-            if (Vector2.Distance(transform.position, moveSpots[i].transform.position) < 0.1f)
+            if (Vector2.Distance(transform.position, middlePoints[i]) < 0.01f)
             {
-                if (moveSpots[i] != moveSpots[moveSpots.Length - 1])
+                if (i < middlePoints.Length - 1)
                 {
                     i++;
                 }
