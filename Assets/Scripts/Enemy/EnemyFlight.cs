@@ -10,13 +10,19 @@ public class EnemyFlight : MonoBehaviour
     public bool canMove = false;
     public float speed = 1.3f;
     public float changeMiddlePointDistance = 0.001f;
+    public SpriteRenderer batSR;
+    //public GameObject stolenObject;
+    public SpriteRenderer stolenObjectSR;
+    private ElementUtilities elementUtilities;
     private Vector2[] middlePoints;
     private bool didMiddlePointEstablished = false;
     private int i = 0;
 
     private void Awake()
     {
+        stolenObjectSR.enabled = false;
         middlePoints = new Vector2[3];
+        elementUtilities = GameObject.Find("GameUtilities").GetComponent<ElementUtilities>();
     }
 
     private void SetMiddlePoints()
@@ -26,10 +32,10 @@ public class EnemyFlight : MonoBehaviour
             middlePoints[0] = new Vector2(6 * (flightPoint.transform.position.x - transform.position.x) / 10 + transform.position.x, (flightPoint.transform.position.y - transform.position.y) / 10 + transform.position.y);
             middlePoints[1] = new Vector2(9 * (flightPoint.transform.position.x - transform.position.x) / 10 + transform.position.x, 9 * (flightPoint.transform.position.y - transform.position.y) / 10 + transform.position.y);
             middlePoints[2] = flightPoint.transform.position;
+            stolenObjectSR.enabled = true;
             didMiddlePointEstablished = true;
         }
     }
-
 
     private void Update()
     {
@@ -37,6 +43,7 @@ public class EnemyFlight : MonoBehaviour
         {
             SetMiddlePoints();
             transform.position = Vector2.MoveTowards(transform.position, middlePoints[i], speed * Time.deltaTime);
+            StartCoroutine(elementUtilities.CheckMoving(batSR, this.gameObject, flightPoint));
 
             if (Vector2.Distance(transform.position, middlePoints[i]) < changeMiddlePointDistance)
             {
@@ -46,6 +53,7 @@ public class EnemyFlight : MonoBehaviour
                 }
                 else
                 {
+                    gameObject.SetActive(false);
                     canMove = false;
                 }
             }

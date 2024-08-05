@@ -9,7 +9,13 @@ public class FollowingTarget : MonoBehaviour
     public GameObject target;
     public float speed = 1.3f;
     public float disableDistance = 0.001f;
-    public SpriteRenderer spriteRenderer;
+    public SpriteRenderer batSR;
+    private ElementUtilities elementUtilities;
+
+    private void Awake()
+    {
+        elementUtilities = GameObject.Find("GameUtilities").GetComponent<ElementUtilities>();
+    }
 
     private void Update()
     {
@@ -22,7 +28,7 @@ public class FollowingTarget : MonoBehaviour
     private void FollowTarget()
     {
 
-        StartCoroutine(CheckMoving());
+        StartCoroutine(elementUtilities.CheckMoving(batSR, this.gameObject, target));
 
         Vector3 separationVector = new Vector3(separation, 0, 0);
 
@@ -38,20 +44,6 @@ public class FollowingTarget : MonoBehaviour
         if (Vector2.Distance(transform.position, target.transform.position) < disableDistance)
         {
             canFollow = false;
-        }
-    }
-
-    private IEnumerator CheckMoving()
-    {
-        yield return new WaitForSeconds(0);
-
-        if (transform.position.x > target.transform.position.x)
-        {
-            spriteRenderer.flipX = true;
-        }
-        else if (transform.position.x < target.transform.position.x)
-        {
-            spriteRenderer.flipX = false;
         }
     }
 }
